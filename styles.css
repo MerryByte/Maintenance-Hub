@@ -26,10 +26,15 @@ header {
   background: #0d1014;
   gap: 12px;
 }
-
+.tapani-logo {
+    width: 40px;
+    height: 40px;
+    margin: 0 10px 0 0;
+}
 header .brand {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
   gap: 2px;
   min-width: 0;
 }
