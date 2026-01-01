@@ -46,14 +46,18 @@ const fabUserLink = document.getElementById("fabUserLink");
 const fabAdminLink = document.getElementById("fabAdminLink");
 
 if (pageFab && pageFabBtn && pageFabBackdrop) {
-  const isAdminPage = location.pathname.toLowerCase().includes("admin.html");
-  if (isAdminPage && fabAdminLink) {
-    fabAdminLink.style.opacity = "0.55";
-    fabAdminLink.style.pointerEvents = "none";
-  } else if (fabUserLink) {
-    fabUserLink.style.opacity = "0.55";
-    fabUserLink.style.pointerEvents = "none";
-  }
+  const path = location.pathname.toLowerCase();
+const isAdminPage = path === "/admin" || path.endsWith("/admin/") || path.endsWith("/admin.html");
+
+if (isAdminPage) {
+  fabAdminLink && (fabAdminLink.style.opacity = "0.55");
+  fabAdminLink && (fabAdminLink.style.pointerEvents = "none");
+} else {
+  fabUserLink && (fabUserLink.style.opacity = "0.55");
+  fabUserLink && (fabUserLink.style.pointerEvents = "none");
+}
+
+
 
   function closeFab() { pageFab.classList.remove("open"); }
   function toggleFab() { pageFab.classList.toggle("open"); }
