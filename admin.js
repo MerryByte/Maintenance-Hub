@@ -39,8 +39,22 @@ lightbox.addEventListener("click", () => {
   document.body.style.overflow = "";
 });
 
+function normalizeOneDriveUrl(url) {
+  const u = url.trim();
+  if (!u) return "";
+
+  // If user already added download=1, leave it.
+  if (u.includes("download=1")) return u;
+
+  // Best-effort: append download=1 (works for many OneDrive/SharePoint links)
+  if (u.includes("?")) return u + "&download=1";
+  return u + "?download=1";
+}
+
 
 // DOM
+const elImgUrlInput = document.getElementById("imgUrlInput");
+const elImgUrlName = document.getElementById("imgUrlName");
 const elAddMasterInput = document.getElementById("addMasterInput");
 const elTree = document.getElementById("tree");
 const elUpdatedAt = document.getElementById("updatedAt");
@@ -194,10 +208,10 @@ function renderSelectedPanel() {
     card.className = "card";
 
     const image = document.createElement("img");
-    image.src = img.dataUrl;
+    image.src = img.url || img.dataUrl || "";
     image.alt = img.name || "image";
     image.style.cursor = "zoom-in";
-    image.addEventListener("click", () => openLightbox(img.dataUrl, img.name || ""));
+    image.addEventListener("click", () => openLightbox(img.url || img.dataUrl || "", img.name || ""))
 
     const cap = document.createElement("div");
     cap.className = "cap";
@@ -227,6 +241,32 @@ function renderSelectedPanel() {
 }
 
 // Buttons
+document.getElementById("addImgUrlBtn").addEventListener("click", () => {
+  const found = findNode(data.root, selectedId);
+  if (!found) return;
+
+  const rawUrl = (elImgUrlInput?.value || "").trim();
+  if (!rawUrl) return;
+
+  const url = normalizeOneDriveUrl(rawUrl);
+  const name = (elImgUrlName?.value || "").trim() || "OneDrive image";
+
+  found.node.images = found.node.images || [];
+  found.node.images.push({
+    id: crypto.randomUUID?.() || String(Date.now()),
+    name,
+    url
+  });
+
+  if (elImgUrlInput) elImgUrlInput.value = "";
+  if (elImgUrlName) elImgUrlName.value = "";
+
+  saveData(data);
+  data = loadData();
+  renderTree();
+});
+
+
 document.getElementById("addMasterBtn").addEventListener("click", () => {
   const name = (elAddMasterInput?.value || "").trim();
   if (!name) return;

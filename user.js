@@ -175,10 +175,14 @@ function renderImagesOnly() {
     card.className = "card";
 
     const image = document.createElement("img");
-    image.src = img.dataUrl;
+    image.src = img.url || img.dataUrl || "";
     image.alt = img.name || "image";
     image.style.cursor = "zoom-in";
-    image.addEventListener("click", () => openLightbox(img.dataUrl, img.name || ""));
+    image.addEventListener("click", () => {
+      openLightbox(img.url || img.dataUrl || "", img.name || "");
+    });
+
+
 
     const cap = document.createElement("div");
     cap.className = "cap";
