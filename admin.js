@@ -21,12 +21,14 @@ function applyRemote(next) {
 // Sidebar drawer toggle (mobile)
 const treeToggleBtn = document.getElementById("treeToggleBtn");
 const overlay = document.getElementById("overlay");
+const sidebarCloseBtn = document.getElementById("sidebarCloseBtn");
 
 function closeSidebar() { document.body.classList.remove("sidebar-open"); }
 function toggleSidebar() { document.body.classList.toggle("sidebar-open"); }
 
 treeToggleBtn?.addEventListener("click", toggleSidebar);
 overlay?.addEventListener("click", closeSidebar);
+sidebarCloseBtn?.addEventListener("click", closeSidebar);
 window.addEventListener("resize", () => { if (window.innerWidth > 720) closeSidebar(); });
 
 // Lightbox
