@@ -19,6 +19,7 @@ body {
 
 body.sidebar-open {
   overflow: hidden;
+  touch-action: none;
 }
 
 header {
