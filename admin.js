@@ -144,7 +144,7 @@ function renderNodeRow(node, depth) {
 
   const right = document.createElement("div");
   right.className = "badge";
-  right.textContent = `${countDescendants(node)} under`;
+  
 
   row.appendChild(left);
   row.appendChild(right);
