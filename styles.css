@@ -17,6 +17,10 @@ body {
   color: var(--text);
 }
 
+body.sidebar-open {
+  overflow: hidden;
+}
+
 header {
   display: flex;
   align-items: center;
