@@ -162,6 +162,8 @@ function renderNodeRow(node, depth) {
   row.className = "tree-item" + (node.id === selectedId ? " selected" : "");
   row.style.marginLeft = (depth * 12) + "px";
   row.draggable = true;
+  row.dataset.depth = String(depth);
+  if (depth > 0) row.classList.add(`depth-${Math.min(depth, 6)}`);
 
   const left = document.createElement("div");
   left.className = "left";
@@ -180,7 +182,7 @@ function renderNodeRow(node, depth) {
   left.appendChild(meta);
 
   const right = document.createElement("div");
-  right.className = "badge";
+  // right.className = "badge";
   
 
   row.appendChild(left);

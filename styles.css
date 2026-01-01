@@ -175,6 +175,31 @@ button.danger:hover { border-color: #ff5a5a; }
 
 .tree-item.selected {
   border-color: var(--accent);
+  background: #2a240f;
+}
+.tree-item.depth-1 {
+  background: #111823;
+  border-color: #2a4a78;
+}
+.tree-item.depth-2 {
+  background: #0f1620;
+  border-color: #2f5a86;
+}
+.tree-item.depth-3 {
+  background: #0d141d;
+  border-color: #366793;
+}
+.tree-item.depth-4 {
+  background: #0c121a;
+  border-color: #3e73a0;
+}
+.tree-item.depth-5 {
+  background: #0b1118;
+  border-color: #4680ad;
+}
+.tree-item.depth-6 {
+  background: #0a0f16;
+  border-color: #4f8cba;
 }
 .tree-item.dragging {
   opacity: 0.6;

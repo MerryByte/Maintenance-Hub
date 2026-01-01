@@ -125,6 +125,8 @@ function renderNodeRow(node, depth) {
   const row = document.createElement("div");
   row.className = "tree-item" + (node.id === selectedId ? " selected" : "");
   row.style.marginLeft = (depth * 12) + "px";
+  row.dataset.depth = String(depth);
+  if (depth > 0) row.classList.add(`depth-${Math.min(depth, 6)}`);
 
   const left = document.createElement("div");
   left.className = "left";
@@ -135,14 +137,14 @@ function renderNodeRow(node, depth) {
 
   const meta = document.createElement("div");
   meta.className = "meta";
-  meta.textContent = `${(node.children || []).length} child`;
+  // meta.textContent = `${(node.children || []).length} child`;
 
   left.appendChild(name);
   left.appendChild(meta);
 
   const right = document.createElement("div");
-  right.className = "badge";
-  right.textContent = `${countDescendants(node)} under`;
+  // right.className = "badge";
+  // right.textContent = `${countDescendants(node)} under`;
 
   row.appendChild(left);
   row.appendChild(right);
