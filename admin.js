@@ -1,5 +1,5 @@
 import {
-  loadData, saveData, resetData,
+  loadData, saveData, resetData, syncFromRemote,
   findNode, countDescendants, removeNodeById,
   fileToDataUrl
 } from "./app.js";
@@ -9,6 +9,14 @@ const EXPANDED_KEY_ADMIN = "maintenanceHubExpanded_admin_v1";
 let data = loadData();
 let selectedId = data.root.children[0]?.id || "root";
 let expanded = loadExpanded(); // collapsed by default
+
+function applyRemote(next) {
+  data = next;
+  if (!findNode(data.root, selectedId)) {
+    selectedId = data.root.children[0]?.id || "root";
+  }
+  renderTree();
+}
 
 // Sidebar drawer toggle (mobile)
 const treeToggleBtn = document.getElementById("treeToggleBtn");
@@ -388,5 +396,8 @@ document.getElementById("clearImagesBtn").addEventListener("click", () => {
 //   localStorage.removeItem(EXPANDED_KEY_ADMIN);
 //   renderTree();
 // });
+
+syncFromRemote(applyRemote);
+setInterval(() => syncFromRemote(applyRemote), 15000);
 
 renderTree();

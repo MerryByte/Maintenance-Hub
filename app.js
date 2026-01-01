@@ -2,6 +2,15 @@
 
 const STORE_KEY = "maintenanceHubData_v1";
 
+const SUPABASE_URL = "https://dgfkmahiymwnusdxfzni.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_JSdwYOdfed3rVuOMl9QKBg_ikDn5l-G";
+const SUPABASE_TABLE = "maintenance_data";
+const SUPABASE_ROW_ID = 1;
+
+function remoteEnabled() {
+  return !!(SUPABASE_URL && SUPABASE_ANON_KEY);
+}
+
 function uid() {
   return Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
 }
@@ -79,6 +88,10 @@ function defaultData() {
   };
 }
 
+function setLocalDataRaw(data) {
+  localStorage.setItem(STORE_KEY, JSON.stringify(data));
+}
+
 export function loadData() {
   try {
     const raw = localStorage.getItem(STORE_KEY);
@@ -100,6 +113,7 @@ export function loadData() {
 export function saveData(data) {
   data.updatedAt = new Date().toISOString();
   localStorage.setItem(STORE_KEY, JSON.stringify(data));
+  void pushRemoteData(data);
 }
 
 export function resetData() {
@@ -107,6 +121,64 @@ export function resetData() {
   localStorage.setItem(STORE_KEY, JSON.stringify(seed));
   return seed;
 }
+
+async function fetchRemoteRow() {
+  if (!remoteEnabled()) return null;
+  const url = `${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?id=eq.${SUPABASE_ROW_ID}&select=id,data,updated_at`;
+  const res = await fetch(url, {
+    headers: {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      Accept: "application/json"
+    }
+  });
+  if (!res.ok) return null;
+  const rows = await res.json();
+  return rows && rows.length ? rows[0] : null;
+}
+
+export async function syncFromRemote(onUpdate) {
+  if (!remoteEnabled()) return;
+  try {
+    const row = await fetchRemoteRow();
+    if (!row || !row.data) return;
+
+    const local = loadData();
+    const remoteTime = Date.parse(row.data.updatedAt || row.updated_at || 0);
+    const localTime = Date.parse(local.updatedAt || 0);
+
+    if (remoteTime > localTime) {
+      setLocalDataRaw(row.data);
+      if (typeof onUpdate === "function") onUpdate(row.data);
+    }
+  } catch {
+    // ignore sync errors
+  }
+}
+
+export async function pushRemoteData(data) {
+  if (!remoteEnabled()) return;
+  try {
+    const url = `${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?on_conflict=id`;
+    await fetch(url, {
+      method: "POST",
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        "Content-Type": "application/json",
+        Prefer: "resolution=merge-duplicates,return=minimal"
+      },
+      body: JSON.stringify({
+        id: SUPABASE_ROW_ID,
+        data,
+        updated_at: data.updatedAt
+      })
+    });
+  } catch {
+    // ignore sync errors
+  }
+}
+
 
 export function findNode(root, id, path = []) {
   if (!root) return null;

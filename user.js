@@ -1,10 +1,18 @@
-import { loadData, findNode, countDescendants } from "./app.js";
+import { loadData, findNode, countDescendants, syncFromRemote } from "./app.js";
 
 const EXPANDED_KEY = "maintenanceHubExpanded_user_v1";
 
 let data = loadData();
 let selectedId = data.root.children[0]?.id || "root";
 let expanded = loadExpanded(); // collapsed by default
+
+function applyRemote(next) {
+  data = next;
+  if (!findNode(data.root, selectedId)) {
+    selectedId = data.root.children[0]?.id || "root";
+  }
+  renderAll();
+}
 
 // ---------- Sidebar drawer toggle ----------
 const treeToggleBtn = document.getElementById("treeToggleBtn");
@@ -203,5 +211,8 @@ function renderAll() {
   renderSidebarTree();
   renderImagesOnly();
 }
+
+syncFromRemote(applyRemote);
+setInterval(() => syncFromRemote(applyRemote), 15000);
 
 renderAll();
