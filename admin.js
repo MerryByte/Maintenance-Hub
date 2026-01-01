@@ -41,6 +41,7 @@ lightbox.addEventListener("click", () => {
 
 
 // DOM
+const elAddMasterInput = document.getElementById("addMasterInput");
 const elTree = document.getElementById("tree");
 const elUpdatedAt = document.getElementById("updatedAt");
 const elSelectedPath = document.getElementById("selectedPath");
@@ -226,6 +227,35 @@ function renderSelectedPanel() {
 }
 
 // Buttons
+document.getElementById("addMasterBtn").addEventListener("click", () => {
+  const name = (elAddMasterInput?.value || "").trim();
+  if (!name) return;
+
+  data.root.children = data.root.children || [];
+  const newNode = {
+    id: (Math.random().toString(36).slice(2, 10) + Date.now().toString(36)),
+    name,
+    images: [],
+    children: []
+  };
+
+  data.root.children.push(newNode);
+
+  // Optional: auto-select the new master category
+  selectedId = newNode.id;
+
+  // Optional: auto-expand it (won't matter until it has children)
+  expanded.add(newNode.id);
+  saveExpanded();
+
+  if (elAddMasterInput) elAddMasterInput.value = "";
+
+  saveData(data);
+  data = loadData();
+  renderTree();
+});
+
+
 document.getElementById("renameBtn").addEventListener("click", () => {
   const found = findNode(data.root, selectedId);
   if (!found) return;
