@@ -176,6 +176,13 @@ button.danger:hover { border-color: #ff5a5a; }
 .tree-item.selected {
   border-color: var(--accent);
 }
+.tree-item.dragging {
+  opacity: 0.6;
+}
+.tree-item.drag-over {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
 
 .selectedCategory {
   font-weight: 600;

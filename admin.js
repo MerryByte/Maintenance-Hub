@@ -135,6 +135,17 @@ function fmtUpdated() {
   elUpdatedAt.textContent = new Date(data.updatedAt).toLocaleString();
 }
 
+function findParent(root, id) {
+  if (!root?.children) return null;
+  for (let i = 0; i < root.children.length; i += 1) {
+    const child = root.children[i];
+    if (child.id === id) return { parent: root, index: i };
+    const found = findParent(child, id);
+    if (found) return found;
+  }
+  return null;
+}
+
 function pathText(path) {
   return path.map(n => n.name).join(" → ");
 }
@@ -150,6 +161,7 @@ function renderNodeRow(node, depth) {
   const row = document.createElement("div");
   row.className = "tree-item" + (node.id === selectedId ? " selected" : "");
   row.style.marginLeft = (depth * 12) + "px";
+  row.draggable = true;
 
   const left = document.createElement("div");
   left.className = "left";
@@ -184,6 +196,54 @@ function renderNodeRow(node, depth) {
       saveExpanded();
     }
 
+    renderTree();
+  });
+
+  row.addEventListener("dragstart", (e) => {
+    row.classList.add("dragging");
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", node.id);
+  });
+
+  row.addEventListener("dragend", () => {
+    row.classList.remove("dragging");
+  });
+
+  row.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  });
+
+  row.addEventListener("dragenter", (e) => {
+    e.preventDefault();
+    row.classList.add("drag-over");
+  });
+
+  row.addEventListener("dragleave", () => {
+    row.classList.remove("drag-over");
+  });
+
+  row.addEventListener("drop", (e) => {
+    e.preventDefault();
+    row.classList.remove("drag-over");
+
+    const draggedId = e.dataTransfer.getData("text/plain");
+    if (!draggedId || draggedId === node.id) return;
+
+    const draggedInfo = findParent(data.root, draggedId);
+    const targetInfo = findParent(data.root, node.id);
+    if (!draggedInfo || !targetInfo) return;
+
+    if (draggedInfo.parent.id !== targetInfo.parent.id) return;
+
+    const siblings = targetInfo.parent.children;
+    const [moved] = siblings.splice(draggedInfo.index, 1);
+    let insertIndex = targetInfo.index;
+    if (draggedInfo.index < targetInfo.index) insertIndex -= 1;
+    siblings.splice(insertIndex, 0, moved);
+
+    saveData(data);
+    data = loadData();
     renderTree();
   });
 

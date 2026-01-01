@@ -198,7 +198,7 @@ function renderImagesOnly() {
 
     const cap = document.createElement("div");
     cap.className = "cap";
-    cap.innerHTML = `<span>${img.name || "image"}</span><span>tap</span>`;
+    cap.innerHTML = `<span>${img.name || "image"}</span><span></span>`;
 
     card.appendChild(image);
     card.appendChild(cap);
